@@ -9,8 +9,16 @@ import (
 )
 
 func main() {
-	highestCalories("input")
-	topCalories("input")
+	fmt.Println("Test Input:")
+	run("test")
+	fmt.Println()
+	fmt.Println("Real Input:")
+	run("input")
+}
+
+func run(input string) {
+	highestCalories(input)
+	topCalories(input)
 }
 
 func topCalories(input string) {
