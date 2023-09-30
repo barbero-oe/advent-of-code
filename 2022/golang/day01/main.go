@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"slices"
 	"strconv"
@@ -22,79 +23,109 @@ func run(input string) {
 }
 
 func topCalories(input string) {
-	f := readLines(input)
-	top := make([]int, 0, 3)
-	currentCalories := 0
-	for f.Scan() {
-		line := f.Text()
-		if line == "" {
-			if l := len(top); l < cap(top) {
-				top = append(top, currentCalories)
-				slices.Sort(top)
-				slices.Reverse(top)
-			} else {
-				for i, v := range top {
-					if v < currentCalories {
-						top = append(top[:i+1], top[i:]...)
-						top[i] = currentCalories
-						top = top[:3]
-						break
-					}
-				}
-			}
-			currentCalories = 0
-		} else {
-			calories, err := strconv.Atoi(line)
-			if err != nil {
-				panic(err)
-			}
-			currentCalories += calories
-		}
-	}
-	for i, v := range top {
-		if v < currentCalories {
-			top = append(top[:i+1], top[i:]...)
-			top[i] = currentCalories
-			top = top[:3]
-			break
-		}
-	}
-	sum := 0
-	for _, v := range top {
-		sum += v
-	}
-	fmt.Println("Top Sum Calories:", sum)
-}
-
-func highestCalories(input string) {
-	f := readLines(input)
-	maxCalories := 0
-	currentCalories := 0
-	for f.Scan() {
-		line := f.Text()
-		if line == "" {
-			if maxCalories < currentCalories {
-				maxCalories = currentCalories
-			}
-			currentCalories = 0
-		} else {
-			calories, err := strconv.Atoi(line)
-			if err != nil {
-				panic(err)
-			}
-			currentCalories += calories
-		}
-	}
-	if maxCalories < currentCalories {
-		maxCalories = currentCalories
-	}
-	fmt.Println("Max Calories:", maxCalories)
-}
-
-func readLines(input string) *bufio.Scanner {
 	file, err := os.Open(input)
 	if err != nil {
 		panic(err)
 	}
-	return bufio.NewScanner(file)
+	defer file.Close()
+	ranking := NewRanking(3)
+	parser := NewCaloriesParser(file)
+	for parser.HasNext() {
+		calories := parser.Calories()
+		calorie := Sum(calories...)
+		ranking.Add(calorie)
+	}
+	sum := Sum(ranking.Top()...)
+	fmt.Println("Top Sum Calories:", sum)
+}
+
+func highestCalories(input string) {
+	file, err := os.Open(input)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+	ranking := NewRanking(1)
+	parser := NewCaloriesParser(file)
+	for parser.HasNext() {
+		calories := parser.Calories()
+		calorie := Sum(calories...)
+		ranking.Add(calorie)
+	}
+	fmt.Println("Max Calories:", ranking.Top()[0])
+}
+
+type CaloriesParser struct {
+	scanner *bufio.Scanner
+	hasNext bool
+}
+
+func NewCaloriesParser(reader io.Reader) *CaloriesParser {
+	return &CaloriesParser{
+		scanner: bufio.NewScanner(reader),
+		hasNext: true,
+	}
+}
+
+func (p *CaloriesParser) HasNext() bool {
+	return p.hasNext
+}
+
+func (p *CaloriesParser) Calories() []int {
+	calories := make([]int, 0)
+	for p.scanner.Scan() {
+		line := p.scanner.Text()
+		if line == "" {
+			return calories
+		} else {
+			calorie, err := strconv.Atoi(line)
+			if err != nil {
+				panic(err)
+			}
+			calories = append(calories, calorie)
+		}
+	}
+	p.hasNext = false
+	return calories
+}
+
+func Sum(num ...int) int {
+	sum := 0
+	for _, v := range num {
+		sum += v
+	}
+	return sum
+}
+
+type Ranking struct {
+	top     int
+	ranking []int
+}
+
+func NewRanking(top int) *Ranking {
+	return &Ranking{
+		top:     top,
+		ranking: make([]int, 0, top+1),
+	}
+}
+
+func (r *Ranking) Add(item int) {
+	if len(r.ranking) < r.top {
+		r.ranking = append(r.ranking, item)
+		slices.Sort(r.ranking)
+		slices.Reverse(r.ranking)
+	} else {
+		for i, current := range r.ranking {
+			if current < item {
+				r.ranking = append(r.ranking[:i+1], r.ranking[i:]...)
+				r.ranking[i] = item
+				r.ranking = r.ranking[:r.top]
+				break
+			}
+		}
+	}
+}
+
+func (r *Ranking) Top() []int {
+	return r.ranking[:]
 }
