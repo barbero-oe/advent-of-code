@@ -8,12 +8,12 @@ import (
 )
 
 const (
-	rock = iota + 1
+	rock = iota
 	paper
 	scissors
 )
 const (
-	needsToLose = iota + 1
+	needsToLose = iota
 	needsToDraw
 	needsToWin
 )
@@ -23,8 +23,8 @@ const (
 	win  = 6
 )
 
-var wins_over = []int{-1, paper, scissors, rock}
-var loses_against = []int{-1, scissors, rock, paper}
+var wins_over = []int{paper, scissors, rock}
+var loses_against = []int{scissors, rock, paper}
 
 func main() {
 	fmt.Println("My Score 1:", partOne("input"))
@@ -69,11 +69,11 @@ func chooseMine(them, me int) int {
 
 func score(them, me int) int {
 	if me == them {
-		return me + draw
+		return 1 + me + draw
 	} else if me == wins_over[them] {
-		return me + win
+		return 1 + me + win
 	} else {
-		return me + loss
+		return 1 + me + loss
 	}
 }
 
@@ -88,7 +88,7 @@ func scan(path string) (*bufio.Scanner, func() error) {
 
 func parse(line string) (int, int) {
 	round := strings.Split(line, " ")
-	them := int(round[0][0] - 'A' + 1)
-	me := int(round[1][0] - 'X' + 1)
+	them := int(round[0][0] - 'A')
+	me := int(round[1][0] - 'X')
 	return them, me
 }
