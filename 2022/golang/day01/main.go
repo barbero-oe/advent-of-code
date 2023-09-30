@@ -18,11 +18,14 @@ func main() {
 }
 
 func run(input string) {
-	highestCalories(input)
-	topCalories(input)
+	top := rankTop(3, input)
+	first := top[0]
+	sum := Sum(top...)
+	fmt.Println("Max Calories:", first)
+	fmt.Println("Top Sum Calories:", sum)
 }
 
-func topCalories(input string) {
+func rankTop(top int, input string) []int {
 	file, err := os.Open(input)
 	if err != nil {
 		panic(err)
@@ -35,24 +38,7 @@ func topCalories(input string) {
 		calorie := Sum(calories...)
 		ranking.Add(calorie)
 	}
-	sum := Sum(ranking.Top()...)
-	fmt.Println("Top Sum Calories:", sum)
-}
-
-func highestCalories(input string) {
-	file, err := os.Open(input)
-	if err != nil {
-		panic(err)
-	}
-	defer file.Close()
-	ranking := NewRanking(1)
-	parser := NewCaloriesParser(file)
-	for parser.HasNext() {
-		calories := parser.Calories()
-		calorie := Sum(calories...)
-		ranking.Add(calorie)
-	}
-	fmt.Println("Max Calories:", ranking.Top()[0])
+	return ranking.Top()
 }
 
 type CaloriesParser struct {
