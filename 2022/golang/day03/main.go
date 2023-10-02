@@ -82,7 +82,7 @@ func SumIntersect(a, b map[rune]int) map[rune]int {
 	return intersection
 }
 
-func Fold[T any, R any](f func(a R, b T) R, sequence []T, first R) R {
+func Fold[T any, R any](f func(R, T) R, sequence []T, first R) R {
 	acc := first
 	for _, item := range sequence {
 		acc = f(acc, item)
