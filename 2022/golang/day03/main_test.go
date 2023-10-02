@@ -20,14 +20,24 @@ func readLines(input string, t *testing.T) []string {
 	return lines
 }
 
-func TestDay(t *testing.T) {
+func TestPart1(t *testing.T) {
 	lines := readLines("test", t)
 	AssertEquals(157, PartOne(lines), t)
+}
+
+func TestPart2(t *testing.T) {
+	lines := readLines("test", t)
+	AssertEquals(70, PartTwo(lines), t)
 }
 
 func TestRealPart1(t *testing.T) {
 	lines := readLines("input", t)
 	AssertEquals(7875, PartOne(lines), t)
+}
+
+func TestRealPart2(t *testing.T) {
+	lines := readLines("input", t)
+	AssertEquals(2479, PartTwo(lines), t)
 }
 
 func AssertEquals[T comparable](expected, actual T, t *testing.T) {
