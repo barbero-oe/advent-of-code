@@ -44,6 +44,7 @@ type TestCase[TC any] struct {
 }
 
 type AoC[T comparable] struct {
+	Input    string
 	Filename string
 	Expected T
 	Fn       func([]string) T
@@ -57,7 +58,12 @@ func Parametrize[T any](t *testing.T, parameters []TestCase[T], fn func(T, *test
 
 func RunAoCTest[T comparable](t *testing.T, parameters []TestCase[AoC[T]]) {
 	Parametrize(t, parameters, func(tc AoC[T], t *testing.T) {
-		lines := ReadLines(tc.Filename)
+		var lines []string
+		if tc.Input == "" {
+			lines = ReadLines(tc.Filename)
+		} else {
+			lines = []string{tc.Input}
+		}
 		actual := tc.Fn(lines)
 		AssertEquals(tc.Expected, actual, t)
 	})
