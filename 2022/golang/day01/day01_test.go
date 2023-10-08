@@ -2,6 +2,8 @@ package day01
 
 import (
 	"testing"
+
+	utils "github.com/barbero-oe/advent-of-code/tree/main/2022/golang"
 )
 
 func TestDay01(t *testing.T) {
@@ -31,16 +33,10 @@ func TestDay01(t *testing.T) {
 
 func Part1(file string, expected int, t *testing.T) {
 	max, _ := run(file)
-	AssertEquals(expected, max, t)
+	utils.AssertEquals(expected, max, t)
 }
 
 func Part2(file string, expected int, t *testing.T) {
 	_, sum := run(file)
-	AssertEquals(expected, sum, t)
-}
-
-func AssertEquals[T comparable](expected, actual T, t *testing.T) {
-	if expected != actual {
-		t.Fatal("Expected", expected, "but got", actual)
-	}
+	utils.AssertEquals(expected, sum, t)
 }
