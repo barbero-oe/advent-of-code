@@ -1,28 +1,18 @@
-package main
+package day01
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"os"
 	"slices"
 	"strconv"
 )
 
-func main() {
-	fmt.Println("Test Input:")
-	run("test")
-	fmt.Println()
-	fmt.Println("Real Input:")
-	run("input")
-}
-
-func run(input string) {
+func run(input string) (max int, sum int) {
 	top := rankTop(3, input)
 	first := top[0]
-	sum := Sum(top...)
-	fmt.Println("Max Calories:", first)
-	fmt.Println("Top Sum Calories:", sum)
+	sum = Sum(top...)
+	return first, sum
 }
 
 func rankTop(top int, input string) []int {
