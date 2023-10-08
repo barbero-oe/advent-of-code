@@ -7,7 +7,7 @@ import (
 )
 
 func TestDay04(t *testing.T) {
-	RunParametrizedAoCTestTemplate(t, []TestCase[AoC[int]]{
+	RunAoCTest(t, []TestCase[AoC[int]]{
 		{Name: "01-Test", Tc: AoC[int]{Filename: "test", Expected: 2, Fn: PartOne}},
 	})
 }
