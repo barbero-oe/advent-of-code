@@ -26,6 +26,18 @@ func AssertEquals[T comparable](expected, actual T, t *testing.T) {
 	}
 }
 
+func AssertEqualContents[T comparable](expected, actual []T, t *testing.T) {
+	if len(expected) != len(actual) {
+		t.Fatal("Expected", expected, "but got", actual)
+	} else {
+		for i := 0; i < len(expected); i++ {
+			if expected[i] != actual[i] {
+				t.Fatal("Expected", expected, "but got", actual)
+			}
+		}
+	}
+}
+
 type TestCase[TC any] struct {
 	Name string
 	Tc   TC
