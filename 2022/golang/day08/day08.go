@@ -43,37 +43,11 @@ func PartTwo(lines []string) int {
 	return 0
 }
 
-type MatrixView interface {
-	H() int
-	W() int
-	At(int, int) byte
-}
-
 type Matrix struct {
-	m          [][]byte
-	coord_fn   func(int, int) (int, int)
-	transposed bool
-}
-
-func (m *Matrix) H() int {
-	if m.transposed {
-		return len(m.m[0])
-	} else {
-		return len(m.m)
-	}
-}
-
-func (m *Matrix) W() int {
-	if m.transposed {
-		return len(m.m[0])
-	} else {
-		return len(m.m)
-	}
-}
-
-func (m *Matrix) At(x, y int) byte {
-	i, j := m.coord_fn(x, y)
-	return m.m[j][i]
+	m  [][]byte
+	W  func() int
+	H  func() int
+	At func(int, int) byte
 }
 
 func NewMatrix(lines []string) Matrix {
@@ -85,7 +59,12 @@ func NewMatrix(lines []string) Matrix {
 		}
 		matrix[i] = vect
 	}
-	return Matrix{m: matrix, coord_fn: func(x, y int) (int, int) { return x, y }}
+	return Matrix{
+		m:  matrix,
+		W:  func() int { return len(matrix[0]) },
+		H:  func() int { return len(matrix) },
+		At: func(x, y int) byte { return matrix[y][x] },
+	}
 }
 
 func LeftToRight(matrix *Matrix) [][2]int {
@@ -94,7 +73,11 @@ func LeftToRight(matrix *Matrix) [][2]int {
 
 func RightToLeft(matrix *Matrix) [][2]int {
 	reverse := ReverseCoords(matrix)
-	m := Matrix{m: matrix.m, coord_fn: reverse}
+	m := Matrix{
+		m:  matrix.m,
+		W:  matrix.W,
+		H:  matrix.H,
+		At: func(x, y int) byte { return matrix.At(reverse(x, y)) }}
 	coords := VisibleTrees(&m)
 	for i := range coords {
 		coords[i][0], coords[i][1] = reverse(coords[i][0], coords[i][1])
@@ -102,7 +85,7 @@ func RightToLeft(matrix *Matrix) [][2]int {
 	return coords
 }
 
-func ReverseCoords(matrix MatrixView) func(int, int) (int, int) {
+func ReverseCoords(matrix *Matrix) func(int, int) (int, int) {
 	width := matrix.W() - 1
 	height := matrix.H() - 1
 	return func(x, y int) (int, int) {
@@ -113,11 +96,14 @@ func ReverseCoords(matrix MatrixView) func(int, int) (int, int) {
 }
 
 func TopToBottom(matrix *Matrix) [][2]int {
-	transpose := func(x, y int) (int, int) { return y, x }
-	m := Matrix{m: matrix.m, coord_fn: transpose, transposed: true}
+	m := Matrix{
+		m:  matrix.m,
+		W:  matrix.H,
+		H:  matrix.W,
+		At: func(x, y int) byte { return matrix.At(y, x) }}
 	coords := VisibleTrees(&m)
 	for i := range coords {
-		coords[i][0], coords[i][1] = transpose(coords[i][0], coords[i][1])
+		coords[i][0], coords[i][1] = coords[i][1], coords[i][0]
 	}
 	return coords
 }
@@ -128,7 +114,12 @@ func BottomToTop(matrix *Matrix) [][2]int {
 		y, x = x, y
 		return reverse(x, y)
 	}
-	m := Matrix{m: matrix.m, coord_fn: transposeReverse, transposed: true}
+	m := Matrix{
+		m:  matrix.m,
+		H:  matrix.W,
+		W:  matrix.H,
+		At: func(x, y int) byte { return matrix.At(transposeReverse(x, y)) },
+	}
 	coords := VisibleTrees(&m)
 	for i := range coords {
 		coords[i][0], coords[i][1] = transposeReverse(coords[i][0], coords[i][1])
@@ -136,7 +127,7 @@ func BottomToTop(matrix *Matrix) [][2]int {
 	return coords
 }
 
-func VisibleTrees(matrix MatrixView) [][2]int {
+func VisibleTrees(matrix *Matrix) [][2]int {
 	visible := make([][2]int, 0)
 	for y := 1; y < matrix.H()-1; y++ {
 		tall := matrix.At(0, y)
