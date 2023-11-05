@@ -40,7 +40,90 @@ func knownVisible(matrix *Matrix) [][2]int {
 }
 
 func PartTwo(lines []string) int {
-	return 0
+	m := NewMatrix(lines)
+	maxScore := 0
+	for x := 0; x < m.W(); x++ {
+		for y := 0; y < m.H(); y++ {
+			current := m.MeasureScenicScore(x, y)
+			if current > maxScore {
+				maxScore = current
+			}
+		}
+	}
+	return maxScore
+}
+
+
+func (m *Matrix) MeasureScenicScore(x, y int) int {
+	left := m.leftScore(x, y)
+	right := m.rightScore(x, y)
+	up := m.upScore(x, y)
+	down := m.downScore(x, y)
+	return left * right * up * down
+}
+
+func (m *Matrix) leftScore(x, y int) int {
+	if x == 0 {
+		return 0
+	}
+	height := m.At(x, y)
+	score := 0
+	for i := x - 1; i >= 0; i-- {
+		score++
+		current := m.At(i, y)
+		if current >= height {
+			break
+		}
+	}
+	return score
+}
+
+func (m *Matrix) rightScore(x, y int) int {
+	if x >= m.W() - 1 {
+		return 0
+	}
+	height := m.At(x, y)
+	score := 0
+	for i := x + 1; i < m.W(); i++ {
+		score++
+		current := m.At(i, y)
+		if current >= height {
+			break
+		}
+	}
+	return score
+}
+
+func (m *Matrix) upScore(x, y int) int {
+	if y == 0 {
+		return 0
+	}
+	height := m.At(x, y)
+	score := 0
+	for j := y - 1; j >= 0; j-- {
+		score++
+		current := m.At(x, j)
+		if current >= height {
+			break
+		}
+	}
+	return score
+}
+
+func (m *Matrix) downScore(x, y int) int {
+	if y >= m.H() {
+		return 0
+	}
+	height := m.At(x, y)
+	score := 0
+	for j := y + 1; j < m.H(); j++ {
+		score++
+		current := m.At(x, j)
+		if current >= height {
+			break
+		}
+	}
+	return score
 }
 
 type Matrix struct {
