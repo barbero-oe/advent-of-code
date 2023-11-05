@@ -7,8 +7,16 @@ import (
 )
 
 func PartOne(lines []string) int {
-	head := [2]int{0, 0}
-	tail := [2]int{0, 0}
+	return Simulate(lines, 2)
+}
+
+func Simulate(lines []string, ropeLenght int) int {
+	rope := make([][2]int, ropeLenght)
+	for i := 0; i < ropeLenght; i++ {
+		rope[i] = [2]int{0, 0}
+	}
+	head := &rope[0]
+	tail := &rope[len(rope)-1]
 	visited := make(map[[2]int]struct{})
 	for _, line := range lines {
 		direction, count := parse(line)
@@ -23,19 +31,23 @@ func PartOne(lines []string) int {
 			case "D":
 				head[1]--
 			}
-			x, y := head[0]-tail[0], head[1]-tail[1]
-			switch {
-			case x != 0 && y != 0:
-				if max(math.Abs(float64(x)), math.Abs(float64(y))) > 1 {
-					tail[0] += moveBoth(x)
-					tail[1] += moveBoth(y)
+			for i := 1; i < len(rope); i++ {
+				previous := &rope[i-1]
+				current := &rope[i]
+				x, y := previous[0]-current[0], previous[1]-current[1]
+				switch {
+				case x != 0 && y != 0:
+					if max(math.Abs(float64(x)), math.Abs(float64(y))) > 1 {
+						current[0] += moveBoth(x)
+						current[1] += moveBoth(y)
+					}
+				case x != 0:
+					current[0] += move(x)
+				case y != 0:
+					current[1] += move(y)
 				}
-			case x != 0:
-				tail[0] += move(x)
-			case y != 0:
-				tail[1] += move(y)
 			}
-			visited[tail] = struct{}{}
+			visited[*tail] = struct{}{}
 		}
 
 	}
@@ -69,5 +81,5 @@ func parse(line string) (string, int) {
 }
 
 func PartTwo(lines []string) int {
-	return 0
+	return Simulate(lines, 10)
 }
