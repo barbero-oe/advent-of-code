@@ -1,4 +1,4 @@
-from functools import reduce
+import math
 import operator
 
 
@@ -35,7 +35,6 @@ def part_two(lines: list[str]) -> int:
     return sum(game_power(reveals) for _, reveals in games)
 
 def game_power(reveals: list[tuple[int, int, int]]) -> int:
-    minimum_dices = (max(x) for x in zip(*reveals))
-    without_zero_dices = (x for x in minimum_dices if x > 0)
-    return reduce(operator.mul, without_zero_dices, 1)
+    minimum_cubes = (max(x) for x in zip(*reveals))
+    return math.prod(x for x in minimum_cubes if x > 0)
     
