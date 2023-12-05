@@ -18,6 +18,9 @@ def read(path: Path) -> list[str]:
     ("day02", "part_one", "input", 3059),
     ("day02", "part_two", "sample01", 2286),
     ("day02", "part_two", "input", 65371),
+    ("day03", "part_one", "sample01", 4361),
+    ("day03", "part_two", "sample01", 467835),
+    ("day03", "part_two", "input", 80694070),
 ])
 def test_parts(module_name: str, part: str, file: str, expect: Any):
     module = importlib.import_module(f"advent.{module_name}.{module_name}")
